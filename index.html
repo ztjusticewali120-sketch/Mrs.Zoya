@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mrs. Zoya — AI Language Tutor | Rehan School Clone</title>
+  <style>
+    :root {
+      --bg: #071318;
+      --card: #0e2027;
+      --card-2: #132a33;
+      --border: rgba(255, 255, 255, 0.09);
+      --text: #eef6f8;
+      --muted: #93aeb8;
+      --accent: #10b981;
+      --accent-2: #06b6d4;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: radial-gradient(circle at top right, #0d333b 0%, var(--bg) 55%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    button, input, select { font-family: inherit; }
+
+    /* Top Bar */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(7, 19, 24, 0.85);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .brand { display: flex; align-items: center; gap: 11px; }
+    .logo {
+      width: 40px; height: 40px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid; place-items: center; font-weight: 800; font-size: 18px; color: #04211a;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+    }
+    .brand h1 { font-size: 17px; font-weight: 700; line-height: 1.2; }
+    .brand span { font-size: 12px; color: var(--muted); display: block; }
+
+    .stats-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .pill {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 6px 11px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 600;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .btn-ghost {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 7px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-ghost:hover { border-color: var(--accent); }
+
+    /* Main Container */
+    .container {
+      max-width: 980px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px 16px 36px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Home Screen */
+    .hero {
+      text-align: center;
+      padding: 18px 12px 22px;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(16, 185, 129, 0.14);
+      color: #6ee7b7;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .hero h2 { font-size: clamp(24px, 4vw, 34px); margin-bottom: 8px; }
+    .hero p { color: var(--muted); max-width: 600px; margin: 0 auto; font-size: 14.5px; }
+
+    .topic-row {
+      display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 16px 0 20px;
+    }
+    .topic-chip {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .topic-chip.active {
+      background: rgba(16, 185, 129, 0.18);
+      color: #a7f3d0;
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+
+    .lang-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+      gap: 12px;
+    }
+    .lang-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: left;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s, background 0.15s;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .lang-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+      background: var(--card-2);
+    }
+    .lang-flag { font-size: 28px; }
+    .lang-name { font-size: 16px; font-weight: 700; }
+    .lang-native { font-size: 12.5px; color: var(--muted); }
+    .lang-cta {
+      margin-top: 6px; font-size: 12px; font-weight: 600; color: #6ee7b7;
+    }
+
+    /* Call Screen */
+    .hidden { display: none !important; }
+    .call-wrap {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 110px);
+      min-height: 520px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .call-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      background: rgba(0, 0, 0, 0.22);
+      border-bottom: 1px solid var(--border);
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .tutor-mini { display: flex; align-items: center; gap: 12px; }
+    .avatar-ring {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid; place-items: center; font-size: 22px;
+      position: relative;
+      transition: transform 0.2s;
+    }
+    .avatar-ring.speaking {
+      animation: pulseSpeak 1s infinite ease-in-out;
+      box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.25);
+    }
+    .avatar-ring.listening {
+      animation: pulseListen 1.2s infinite ease-in-out;
+      box-shadow: 0 0 0 6px rgba(6, 182, 212, 0.28);
+    }
+    @keyframes pulseSpeak {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+    @keyframes pulseListen {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .status-text { font-size: 12.5px; color: #6ee7b7; font-weight: 600; }
+    .call-controls-top { display: flex; align-items: center; gap: 8px; }
+    .timer-badge {
+      font-variant-numeric: tabular-nums;
+      background: rgba(255,255,255,0.07);
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .btn-end {
+      background: var(--danger);
+      border: none; color: #fff;
+      padding: 7px 14px; border-radius: 10px;
+      font-weight: 700; font-size: 13px; cursor: pointer;
+    }
+
+    /* Live Captions Area */
+    .captions {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .msg {
+      max-width: 82%;
+      padding: 11px 14px;
+      border-radius: 16px;
+      line-height: 1.45;
+      font-size: 14.5px;
+      animation: fadeIn 0.15s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    .msg.zoya {
+      align-self: flex-start;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+    .msg.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #059669, #0d9488);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .msg.interim {
+      align-self: flex-end;
+      background: rgba(6, 182, 212, 0.16);
+      border: 1px dashed rgba(6, 182, 212, 0.5);
+      color: #bae6fd;
+      font-style: italic;
+    }
+    .msg-meta {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; margin-bottom: 4px; font-size: 11.5px; opacity: 0.78; font-weight: 700;
+    }
+    .mini-btn {
+      background: rgba(255,255,255,0.1);
+      border: none; color: var(--text);
+      padding: 2px 7px; border-radius: 6px;
+      font-size: 11px; cursor: pointer;
+    }
+    .mini-btn:hover { background: rgba(255,255,255,0.2); }
+
+    /* Call Footer */
+    .call-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.25);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .voice-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .mic-btn {
+      flex: 1;
+      min-width: 180px;
+      padding: 12px 18px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #04211a;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .mic-btn.active {
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      color: #fff;
+    }
+    .toggle-label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12.5px; color: var(--muted); cursor: pointer;
+      user-select: none;
+    }
+    .text-form { display: flex; gap: 8px; }
+    .text-form input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      outline: none;
+    }
+    .text-form input:focus { border-color: var(--accent); }
+    .send-btn {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .send-btn:hover { border-color: var(--accent); }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: grid; place-items: center;
+      padding: 16px; z-index: 50;
+    }
+    .modal {
+      width: 100%; max-width: 470px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .modal h3 { font-size: 18px; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+    .field input, .field select {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-size: 13.5px;
+    }
+    .lb-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 9px 12px; border-radius: 10px; background: var(--card-2); font-size: 13.5px;
+    }
+    .lb-row.me { border: 1px solid var(--accent); background: rgba(16,185,129,0.12); }
+    .note { font-size: 12px; color: var(--muted); line-height: 1.45; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">Z</div>
+      <div>
+        <h1>Mrs. Zoya AI</h1>
+        <span>Rehan School Language Tutor Clone</span>
+      </div>
+    </div>
+    <div class="stats-bar">
+      <div class="pill" title="Daily speaking streak">🔥 <span id="streakVal">1</span>d</div>
+      <div class="pill" title="Real speaking time">⏱️ <span id="totalMinsVal">0</span>m</div>
+      <div class="pill" title="XP Score">⭐ <span id="xpVal">0</span> XP</div>
+      <button class="btn-ghost" onclick="openModal('leaderboardModal')">🏆 Rank</button>
+      <button class="btn-ghost" onclick="openModal('settingsModal')">⚙️ AI Settings</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- HOME VIEW -->
+    <section id="homeView">
+      <div class="hero">
+        <div class="badge">Rehan School Style • Speak First, Learn Fast</div>
+        <h2>Learn any language by talking to Mrs. Zoya</h2>
+        <p>Pick a topic and tap a language. Mrs. Zoya listens, replies quickly in natural voice, shows live captions, and gives tiny fixes.</p>
+
+        <div class="topic-row" id="topicRow">
+          <button class="topic-chip active" data-topic="Daily Life & School">🏫 Daily Life</button>
+          <button class="topic-chip" data-topic="Basic Greetings & Intro">👋 Greetings</button>
+          <button class="topic-chip" data-topic="Ordering Food & Travel">✈️ Travel & Food</button>
+          <button class="topic-chip" data-topic="Job & Confidence Speaking">💼 Confidence</button>
+        </div>
+      </div>
+
+      <div class="lang-grid" id="langGrid"></div>
+    </section>
+
+    <!-- CALL VIEW -->
+    <section id="callView" class="call-wrap hidden">
+      <div class="call-header">
+        <div class="tutor-mini">
+          <div class="avatar-ring" id="avatarRing">👩‍🏫</div>
+          <div>
+            <div style="font-weight:700; font-size:15.5px;">
+              Mrs. Zoya · <span id="callLangName">English</span>
+            </div>
+            <div class="status-text" id="statusText">Ready to talk</div>
+          </div>
+        </div>
+        <div class="call-controls-top">
+          <span class="pill" id="modeBadge" style="font-size:11.5px;">⚡ Instant Mode</span>
+          <span class="timer-badge" id="callTimer">00:00</span>
+          <button class="btn-end" onclick="endCall()">End Call</button>
+        </div>
+      </div>
+
+      <div class="captions" id="captions"></div>
+
+      <div class="call-footer">
+        <div class="voice-bar">
+          <button class="mic-btn" id="micBtn" onclick="toggleMic()">
+            🎙️ Tap to Speak
+          </button>
+          <label class="toggle-label">
+            <input type="checkbox" id="autoListen" checked />
+            Hands-free Auto-Listen
+          </label>
+          <label class="toggle-label">
+            <input type="checkbox" id="voiceOut" checked />
+            Voice Reply
+          </label>
+        </div>
+        <form class="text-form" onsubmit="sendText(event)">
+          <input id="textInput" type="text" placeholder="Or type quickly in your target language / English..." autocomplete="off" />
+          <button class="send-btn" type="submit">Send ⚡</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- SETTINGS MODAL -->
+  <div id="settingsModal" class="modal-backdrop hidden" onclick="if(event.target===this) closeModal('settingsModal')">
+    <div class="modal">
+      <h3>⚙️ Fast AI Engine Settings</h3>
+      <p class="note">
+        Use <strong>Built-in Instant Mode</strong> for zero-setup practice, or connect <strong>Groq</strong> (ultra-fast ~200ms replies) / <strong>Gemini</strong> / <strong>OpenAI</strong> for full free-flowing AI conversations. Keys stay only in your browser.
+      </p>
+      <div class="field">
+        <label>AI Provider</label>
+        <select id="providerSelect" onchange="onProviderChange()">
+          <option value="instant">⚡ Built-in Instant Mode (No Key Needed)</option>
+          <option value="groq">🚀 Groq Cloud (Fastest — Llama 3.1 8B Instant)</option>
+          <option value="gemini">✨ Google Gemini Flash</option>
+          <option value="openai">🤖 OpenAI (GPT-4o-mini)</option>
+        </select>
+      </div>
+      <div class="field" id="apiKeyField">
+        <label>API Key</label>
+        <input id="apiKeyInput" type="password" placeholder="Paste API key (stored in localStorage)" />
+      </div>
+      <div class="field" id="modelField">
+        <label>Model ID</label>
+        <input id="modelInput" type="text" placeholder="e.g. llama-3.1-8b-instant" />
+      </div>
+      <div class="field">
+        <label>Speaking Speed</label>
+        <select id="rateSelect">
+          <option value="0.85">🐢 Slow (Beginner)</option>
+          <option value="1.0" selected>🗣️ Natural (Recommended)</option>
+          <option value="1.15">⚡ Quick</option>
+        </select>
+      </div>
+      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:4px;">
+        <button class="btn-ghost" onclick="closeModal('settingsModal')">Cancel</button>
+        <button class="btn-ghost" style="background:var(--accent); color:#04211a;" onclick="saveSettings()">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD MODAL -->
+  <div id="leaderboardModal" class="modal-backdrop hidden" onclick="if(event.target===this) closeModal('leaderboardModal')">
+    <div class="modal">
+      <h3>🏆 Rehan School Speaking Leaderboard</h3>
+      <p class="note" id="badgeStatus">Your Rank: Starter</p>
+      <div id="lbList" style="display:flex; flex-direction:column; gap:8px;"></div>
+      <div style="display:flex; justify-content:flex-end;">
+        <button class="btn-ghost" onclick="closeModal('leaderboardModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+const LANGS = [
+  { code: "en", bcp47: "en-US", name: "English", native: "Speak confidently", flag: "🇬🇧",
+    starter: "Assalam-o-Alaikum! I am Mrs. Zoya. How was your day at school today?",
+    sampleFix: ["i go to school", "Tiny fix: say \"I went to school.\" Try saying it back! What did you study?"],
+    drills: [
+      "Awesome! Say this with me: \"I am learning to speak clearly every day.\" What is your favorite subject?",
+      "Nice! In English we say: \"Could you help me, please?\" Can you make a sentence with that?",
+      "Great energy! Tell me one thing you want to achieve this year."
+    ]
+  },
+  { code: "ur", bcp47: "ur-PK", name: "Urdu", native: "اردو بول چال", flag: "🇵🇰",
+    starter: "السلام علیکم! میں مسز زویا ہوں۔ آپ کیسے ہیں؟ (Aap kaise hain?)",
+    drills: [
+      "شاباش! میرے ساتھ بولیں: \"آج موسم بہت اچھا ہے۔\" (Aaj mausam bohat acha hai). آپ کہاں رہتے ہیں؟",
+      "بہت خوب! \"مجھے نئی زبان سیکھنا پسند ہے۔\" (Mujhe nayi zabaan seekhna pasand hai). آپ کا پسندیدہ کھانا کیا ہے؟",
+      "زبردست! \"شکریہ، آپ کی مدد کا۔\" (Shukriya). اب آپ اردو میں اپنا تعارف کروائیں!"
+    ]
+  },
+  { code: "ar", bcp47: "ar-SA", name: "Arabic", native: "العربية", flag: "🇸🇦",
+    starter: "أهلاً بك! أنا مسز زويا. كيف حالك اليوم؟ (Kayfa haluka al-yawm?)",
+    drills: [
+      "ممتاز! قل معي: \"أنا أتعلم العربية كل يوم\" (Ana ata'allam al-Arabiyya). ما اسمك؟",
+      "رائع! قل: \"شكراً جزيلاً\" (Shukran jazeelan). ماذا تحب أن تفعل في وقت فراغك؟",
+      "أحسنت! \"الجو جميل اليوم\" (Al-jaww jameel al-yawm). أين تسكن؟"
+    ]
+  },
+  { code: "ja", bcp47: "ja-JP", name: "Japanese", native: "日本語 (Nihongo)", flag: "🇯🇵",
+    starter: "Konnichiwa! Watashi wa Zoya desu. Say \"Konnichiwa\" (kon-nee-chee-wa)!",
+    drills: [
+      "Sugoi! Now try \"Arigatou gozaimasu\" (thank you). Repeat it slowly!",
+      "Great! Say \"Ogenki desu ka?\" (How are you?). What is your favorite food in Japanese or English?",
+      "Yoku dekimashita! Try: \"Watashi no namae wa ___ desu.\" (My name is ___)."
+    ]
+  },
+  { code: "zh", bcp47: "zh-CN", name: "Chinese", native: "中文 (Mandarin)", flag: "🇨🇳",
+    starter: "Nǐ hǎo! (你好) I am Mrs. Zoya. Say \"Nǐ hǎo\" — it means hello!",
+    drills: [
+      "Hěn hǎo! Now say \"Xièxie\" (谢谢 — shieh-shieh) for thank you. Try it!",
+      "Awesome! Say \"Wǒ xǐhuan xuéxí\" (I like to learn). How are you feeling today?",
+      "Great job! Say \"Zàijiàn\" (再见) for goodbye, or tell me what you ate today!"
+    ]
+  },
+  { code: "tr", bcp47: "tr-TR", name: "Turkish", native: "Türkçe", flag: "🇹🇷",
+    starter: "Merhaba! Ben Zoya Öğretmen. Nasılsın? (How are you?)",
+    drills: [
+      "Harika! Repeat: \"İyiyim, teşekkür ederim!\" (I am fine, thank you). Adın ne?",
+      "Süper! Say \"Türkçe öğreniyorum\" (I am learning Turkish). What do you do every day?",
+      "Çok güzel! Try saying \"Görüşürüz!\" (See you soon)."
+    ]
+  },
+  { code: "es", bcp47: "es-ES", name: "Spanish", native: "Español", flag: "🇪🇸",
+    starter: "¡Hola! Soy la Sra. Zoya. ¿Cómo estás hoy? (How are you today?)",
+    drills: [
+      "¡Muy bien! Say: \"Estoy muy bien, gracias.\" ¿Cómo te llamas?",
+      "¡Excelente! Repeat: \"Me gusta aprender idiomas.\" What do you like to do?",
+      "¡Genial! Say \"Por favor\" (please) and \"Muchas gracias\" (thank you very much)."
+    ]
+  },
+  { code: "de", bcp47: "de-DE", name: "German", native: "Deutsch", flag: "🇩🇪",
+    starter: "Hallo! Ich bin Frau Zoya. Wie geht es dir? (How are you?)",
+    drills: [
+      "Super! Say: \"Mir geht es gut, danke!\" (I am good, thanks). Wie heißt du?",
+      "Toll! Repeat: \"Ich lerne jeden Tag Deutsch.\" Where are you from?",
+      "Sehr gut! Try saying \"Guten Morgen!\" (Good morning)."
+    ]
+  },
+  { code: "pa", bcp47: "pa-IN", name: "Punjabi", native: "ਪੰਜਾਬੀ / پنجابی", flag: "🌾",
+    starter: "Sat Sri Akal / Assalam-o-Alaikum! Ki haal hai tuhada? (How are you?)",
+    drills: [
+      "Wah ji wah! Say: \"Main bilkul theek haan!\" Tuhada naa ki hai?",
+      "Bohat vadiya! Repeat: \"Mainu Punjabi bolna pasand hai.\" Aaj ki kita?",
+      "Shabash! Say \"Dhanwaad / Shukriya\" and tell me about your family."
+    ]
+  },
+  { code: "ps", bcp47: "ps-AF", name: "Pashto", native: "پښتو", flag: "🏔️",
+    starter: "Sta starray ma shay! Za Mrs. Zoya yam. Sanga ye? (How are you?)",
+    drills: [
+      "Dher kha! Say: \"Za kha yam, manana!\" (I am fine, thank you). Sta num sa day?",
+      "Afareen! Repeat: \"Za Pashto zda kawam.\" (I am learning Pashto). Nan de sa okral?",
+      "Kha! Try saying \"Kha raghlast\" (Welcome)!"
+    ]
+  }
+];
+
+// State
+let currentLang = LANGS[0];
+let currentTopic = "Daily Life & School";
+let callActive = false;
+let isListening = false;
+let isSpeaking = false;
+let recognition = null;
+let callSeconds = 0;
+let timerInterval = null;
+let history = [];
+let drillIdx = 0;
+let cachedVoices = [];
+
+const DEFAULT_MODELS = {
+  instant: "",
+  groq: "llama-3.1-8b-instant",
+  gemini: "gemini-flash-latest",
+  openai: "gpt-4o-mini"
+};
+
+let settings = JSON.parse(localStorage.getItem("zoya_settings") || "null") || {
+  provider: "instant",
+  apiKey: "",
+  model: "",
+  rate: 1.0
+};
+
+let stats = JSON.parse(localStorage.getItem("zoya_stats") || "null") || {
+  xp: 0,
+  totalSec: 0,
+  streak: 1,
+  lastDay: new Date().toDateString()
+};
+
+// Init
+(function init() {
+  const today = new Date().toDateString();
+  if (stats.lastDay !== today) {
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    stats.streak = stats.lastDay === yesterday ? stats.streak + 1 : 1;
+    stats.lastDay = today;
+    saveStats();
+  }
+  renderHome();
+  updateStatsUI();
+  updateModeBadge();
+  loadVoices();
+  if (window.speechSynthesis) {
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+  }
+})();
+
+function loadVoices() {
+  if (!window.speechSynthesis) return;
+  cachedVoices = window.speechSynthesis.getVoices();
+}
+
+function saveStats() {
+  localStorage.setItem("zoya_stats", JSON.stringify(stats));
+  updateStatsUI();
+}
+
+function updateStatsUI() {
+  document.getElementById("streakVal").textContent = stats.streak;
+  document.getElementById("totalMinsVal").textContent = Math.floor(stats.totalSec / 60);
+  document.getElementById("xpVal").textContent = stats.xp;
+}
+
+function updateModeBadge() {
+  const map = {
+    instant: "⚡ Instant Mode",
+    groq: "🚀 Groq Fast AI",
+    gemini: "✨ Gemini AI",
+    openai: "🤖 OpenAI"
+  };
+  document.getElementById("modeBadge").textContent = map[settings.provider] || "⚡ Instant Mode";
+}
+
+function renderHome() {
+  const grid = document.getElementById("langGrid");
+  grid.innerHTML = LANGS.map((l, idx) => `
+    <button class="lang-card" onclick="startCall(${idx})">
+      <div class="lang-flag">${l.flag}</div>
+      <div class="lang-name">${l.name}</div>
+      <div class="lang-native">${l.native}</div>
+      <div class="lang-cta">📞 Start Voice Call →</div>
+    </button>
+  `).join("");
+
+  document.querySelectorAll(".topic-chip").forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll(".topic-chip").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentTopic = btn.dataset.topic;
+    };
+  });
+}
+
+// Call Lifecycle
+function startCall(langIdx) {
+  currentLang = LANGS[langIdx];
+  callActive = true;
+  callSeconds = 0;
+  drillIdx = 0;
+  history = [];
+
+  document.getElementById("homeView").classList.add("hidden");
+  document.getElementById("callView").classList.remove("hidden");
+  document.getElementById("callLangName").textContent = `${currentLang.flag} ${currentLang.name}`;
+  document.getElementById("captions").innerHTML = "";
+  document.getElementById("callTimer").textContent = "00:00";
+
+  timerInterval = setInterval(() => {
+    callSeconds++;
+    const m = String(Math.floor(callSeconds / 60)).padStart(2, "0");
+    const s = String(callSeconds % 60).padStart(2, "0");
+    document.getElementById("callTimer").textContent = `${m}:${s}`;
+    if (callSeconds % 10 === 0) {
+      stats.totalSec += 10;
+      saveStats();
+    }
+  }, 1000);
+
+  setupRecognition();
+
+  // Instant opening greeting
+  addMessage("zoya", currentLang.starter);
+  history.push({ role: "assistant", content: currentLang.starter });
+  speak(currentLang.starter, Number(settings.rate), () => {
+    if (callActive && document.getElementById("autoListen").checked) {
+      startListening();
+    }
+  });
+}
+
+function endCall() {
+  callActive = false;
+  clearInterval(timerInterval);
+  stopListening();
+  stopSpeaking();
+  stats.totalSec += (callSeconds % 10);
+  saveStats();
+
+  document.getElementById("callView").classList.add("hidden");
+  document.getElementById("homeView").classList.remove("hidden");
+}
+
+// Speech Recognition (STT)
+function setupRecognition() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    setStatus("Voice input not supported in this browser — type below!");
+    return;
+  }
+  recognition = new SR();
+  recognition.lang = currentLang.bcp47;
+  recognition.continuous = false;
+  recognition.interimResults = true;
+
+  let finalText = "";
+
+  recognition.onstart = () => {
+    isListening = true;
+    finalText = "";
+    document.getElementById("micBtn").classList.add("active");
+    document.getElementById("micBtn").textContent = "🎙️ Listening... (Tap to Stop)";
+    document.getElementById("avatarRing").className = "avatar-ring listening";
+    setStatus(`Listening in ${currentLang.name}...`);
+  };
+
+  recognition.onresult = (e) => {
+    let interim = "";
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) finalText += t + " ";
+      else interim += t;
+    }
+    showInterim(interim || finalText);
+  };
+
+  recognition.onerror = (e) => {
+    isListening = false;
+    removeInterim();
+    if (e.error === "not-allowed") {
+      setStatus("Mic permission blocked. Allow mic or type below.");
+    } else {
+      setStatus("Tap mic or type to continue");
+    }
+    resetMicUI();
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+    removeInterim();
+    resetMicUI();
+    const cleaned = finalText.trim();
+    if (cleaned && callActive) {
+      handleUserInput(cleaned);
+    }
+  };
+}
+
+function toggleMic() {
+  // Barge-in: interrupt Zoya immediately if speaking
+  if (isSpeaking) stopSpeaking();
+
+  if (!recognition) {
+    document.getElementById("textInput").focus();
+    return;
+  }
+  if (isListening) {
+    recognition.stop();
+  } else {
+    startListening();
+  }
+}
+
+function startListening() {
+  if (!recognition || isListening || !callActive) return;
+  try {
+    recognition.lang = currentLang.bcp47;
+    recognition.start();
+  } catch (_) {}
+}
+
+function stopListening() {
+  if (recognition && isListening) {
+    try { recognition.stop(); } catch (_) {}
+  }
+  isListening = false;
+  resetMicUI();
+}
+
+function resetMicUI() {
+  document.getElementById("micBtn").classList.remove("active");
+  document.getElementById("micBtn").textContent = "🎙️ Tap to Speak";
+  if (!isSpeaking) document.getElementById("avatarRing").className = "avatar-ring";
+}
+
+// Text-to-Speech (TTS)
+function speak(text, rate = 1.0, onDone) {
+  if (!document.getElementById("voiceOut").checked || !window.speechSynthesis) {
+    if (onDone) onDone();
+    return;
+  }
+  stopSpeaking();
+
+  const clean = text
+    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, "")
+    .replace(/\*\*/g, "")
+    .trim();
+
+  if (!clean) { if (onDone) onDone(); return; }
+
+  const utter = new SpeechSynthesisUtterance(clean);
+  utter.lang = currentLang.bcp47;
+  utter.rate = rate;
+  utter.pitch = 1.05;
+
+  const prefix = currentLang.code;
+  const match = cachedVoices.find(v => v.lang.toLowerCase().startsWith(prefix) && /female|zoya|google|natural|samantha/i.test(v.name))
+             || cachedVoices.find(v => v.lang.toLowerCase().startsWith(prefix));
+  if (match) utter.voice = match;
+
+  isSpeaking = true;
+  document.getElementById("avatarRing").className = "avatar-ring speaking";
+  setStatus("Mrs. Zoya is speaking...");
+
+  let finished = false;
+  const doneOnce = () => {
+    if (finished) return;
+    finished = true;
+    isSpeaking = false;
+    document.getElementById("avatarRing").className = "avatar-ring";
+    setStatus("Your turn — speak or type!");
+    if (onDone) onDone();
+  };
+
+  utter.onend = doneOnce;
+  utter.onerror = doneOnce;
+  window.speechSynthesis.speak(utter);
+
+  // Safety fallback in case browser TTS hangs
+  setTimeout(doneOnce, Math.max(4000, clean.length * 110));
+}
+
+function stopSpeaking() {
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  isSpeaking = false;
+  document.getElementById("avatarRing").className = "avatar-ring";
+}
+
+// Messaging + Fast AI Response
+function sendText(e) {
+  e.preventDefault();
+  const input = document.getElementById("textInput");
+  const val = input.value.trim();
+  if (!val) return;
+  input.value = "";
+  stopSpeaking();
+  stopListening();
+  handleUserInput(val);
+}
+
+async function handleUserInput(text) {
+  addMessage("user", text);
+  history.push({ role: "user", content: text });
+  stats.xp += 10;
+  saveStats();
+
+  const t0 = performance.now();
+  setStatus("⚡ Zoya is replying...");
+
+  let reply = "";
+  try {
+    if (settings.provider !== "instant" && settings.apiKey.trim()) {
+      reply = await fetchAIReply(text);
+    } else {
+      reply = instantTutorReply(text);
+    }
+  } catch (err) {
+    reply = `${instantTutorReply(text)} (Offline fallback: ${err.message})`;
+  }
+
+  const ms = Math.round(performance.now() - t0);
+  history.push({ role: "assistant", content: reply });
+  if (history.length > 10) history = history.slice(-10);
+
+  addMessage("zoya", reply, ms);
+
+  speak(reply, Number(settings.rate), () => {
+    if (callActive && document.getElementById("autoListen").checked) {
+      startListening();
+    }
+  });
+}
+
+function buildSystemPrompt() {
+  return `You are Mrs. Zoya, a warm, super-patient AI language tutor for Rehan School.
+Target language: ${currentLang.name}. Topic: ${currentTopic}.
+Rules for speed and clarity:
+1. Reply VERY briefly (1 to 2 short spoken sentences max) so voice conversation feels instant.
+2. Speak mostly in ${currentLang.name} (for beginners or non-Latin scripts like Urdu/Arabic/Japanese/Chinese, include simple pronunciation in brackets).
+3. If the student makes a small grammar/word mistake, give a friendly "Tiny fix: ..." and ask them to repeat or answer one easy follow-up question.`;
+}
+
+async function fetchAIReply() {
+  const sys = buildSystemPrompt();
+  const model = settings.model.trim() || DEFAULT_MODELS[settings.provider];
+
+  if (settings.provider === "groq" || settings.provider === "openai") {
+    const url = settings.provider === "groq"
+      ? "https://api.groq.com/openai/v1/chat/completions"
+      : "https://api.openai.com/v1/chat/completions";
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${settings.apiKey.trim()}`
+      },
+      body: JSON.stringify({
+        model,
+        temperature: 0.6,
+        max_tokens: 95,
+        messages: [{ role: "system", content: sys }, ...history]
+      })
+    });
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    const data = await res.json();
+    return data.choices[0].message.content.trim();
+  }
+
+  if (settings.provider === "gemini") {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(settings.apiKey.trim())}`;
+    const contents = history.map(m => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }]
+    }));
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: sys }] },
+        contents,
+        generationConfig: { temperature: 0.6, maxOutputTokens: 110 }
+      })
+    });
+    if (!res.ok) throw new Error(`Gemini ${res.status}`);
+    const data = await res.json();
+    return data.candidates[0].content.parts[0].text.trim();
+  }
+
+  return instantTutorReply("");
+}
+
+function instantTutorReply(userText) {
+  const lower = userText.toLowerCase();
+
+  // Gentle real-time grammar fixes for English learners
+  if (currentLang.code === "en") {
+    if (lower.includes("i go to school yesterday") || /\bi go\b.*\bcricket\b/.test(lower)) {
+      return `Great try! Tiny fix: "I went to school." Say it back! What else did you do?`;
+    }
+    if (/\bi am agree\b/.test(lower)) {
+      return `Good point! Tiny fix: say "I agree" (not "I am agree"). Can you repeat that?`;
+    }
+    if (/\bmy name\b/.test(lower) && !lower.includes("is")) {
+      return `Nice! Tiny fix: "My name IS..." Say the full sentence again!`;
+    }
+    if (lower.includes("how are you") || lower.includes("kaise")) {
+      return `I am doing wonderfully, thank you for asking! How is your ${currentTopic.toLowerCase()} practice going?`;
+    }
+  }
+
+  const drills = currentLang.drills;
+  const reply = drills[drillIdx % drills.length];
+  drillIdx++;
+  return reply;
+}
+
+// Captions UI
+function addMessage(who, text, ms) {
+  const box = document.getElementById("captions");
+  const div = document.createElement("div");
+  div.className = `msg ${who}`;
+
+  const label = who === "zoya"
+    ? `👩‍🏫 Mrs. Zoya ${ms ? `<span style="opacity:.6">(${ms}ms)</span>` : ""}`
+    : "🧑 You";
+
+  const slowBtn = who === "zoya"
+    ? `<button class="mini-btn" onclick='speak(${JSON.stringify(text)}, 0.72)'>🐢 Slow</button>`
+    : "";
+
+  div.innerHTML = `
+    <div class="msg-meta"><span>${label}</span>${slowBtn}</div>
+    <div>${escapeHtml(text)}</div>
+  `;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function showInterim(text) {
+  let el = document.getElementById("interimBubble");
+  const box = document.getElementById("captions");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "interimBubble";
+    el.className = "msg interim";
+    box.appendChild(el);
+  }
+  el.textContent = "🎙️ " + text;
+  box.scrollTop = box.scrollHeight;
+}
+
+function removeInterim() {
+  const el = document.getElementById("interimBubble");
+  if (el) el.remove();
+}
+
+function setStatus(txt) {
+  document.getElementById("statusText").textContent = txt;
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+}
+
+// Modals & Settings
+function openModal(id) {
+  if (id === "settingsModal") {
+    document.getElementById("providerSelect").value = settings.provider;
+    document.getElementById("apiKeyInput").value = settings.apiKey;
+    document.getElementById("modelInput").value = settings.model || DEFAULT_MODELS[settings.provider];
+    document.getElementById("rateSelect").value = String(settings.rate);
+    onProviderChange();
+  }
+  if (id === "leaderboardModal") renderLeaderboard();
+  document.getElementById(id).classList.remove("hidden");
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.add("hidden");
+}
+
+function onProviderChange() {
+  const p = document.getElementById("providerSelect").value;
+  const hide = p === "instant";
+  document.getElementById("apiKeyField").classList.toggle("hidden", hide);
+  document.getElementById("modelField").classList.toggle("hidden", hide);
+  if (!hide) {
+    document.getElementById("modelInput").value = DEFAULT_MODELS[p];
+  }
+}
+
+function saveSettings() {
+  settings = {
+    provider: document.getElementById("providerSelect").value,
+    apiKey: document.getElementById("apiKeyInput").value,
+    model: document.getElementById("modelInput").value,
+    rate: Number(document.getElementById("rateSelect").value)
+  };
+  localStorage.setItem("zoya_settings", JSON.stringify(settings));
+  updateModeBadge();
+  closeModal("settingsModal");
+}
+
+function renderLeaderboard() {
+  const rankName = stats.xp >= 500 ? "Language Master" : stats.xp >= 200 ? "Confident Speaker" : stats.xp >= 50 ? "Rising Learner" : "Starter";
+  document.getElementById("badgeStatus").textContent = `Badge: 🏅 ${rankName} (${stats.xp} XP · ${Math.floor(stats.totalSec / 60)}m spoken)`;
+
+  const rows = [
+    { name: "Ayesha (Korangi Campus)", xp: 640 },
+    { name: "Hamza (Islamabad Campus)", xp: 420 },
+    { name: "Zainab (Karachi)", xp: 210 },
+    { name: "You", xp: stats.xp, me: true },
+    { name: "Bilal (Lahore)", xp: 40 }
+  ].sort((a, b) => b.xp - a.xp);
+
+  document.getElementById("lbList").innerHTML = rows.map((r, i) => `
+    <div class="lb-row ${r.me ? "me" : ""}">
+      <span><strong>#${i + 1}</strong> ${r.name}</span>
+      <strong>${r.xp} XP</strong>
+    </div>
+  `).join("");
+}
+</script>
+</body>
+</html>
